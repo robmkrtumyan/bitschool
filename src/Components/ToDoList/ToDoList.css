@@ -1,0 +1,9 @@
+.todo-wrapper{
+    width: 500px;
+    margin: 100px auto 0;
+}
+
+.showTaskBoxes{
+    display: flex;
+    justify-content: space-between;
+}

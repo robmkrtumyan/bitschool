@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { Container, Row, Col } from 'react-bootstrap'
 import AddTask from './AddTask/AddTask'
 import Task from './Task/Task'
 import './ToDoList.css'
@@ -20,17 +21,27 @@ class ToDoList extends Component {
     render() {
         const {tasks} = this.state
         const showTasks = tasks.map( (task, index) => {
-            return <Task task={task} key={index} />
+            return( 
+                <Col key={index} md={3} lg={4}>
+                    <Task task={task} />
+                </Col>
+            )
         })
         return (
-            <div className="todo-wrapper">
-                <AddTask 
-                    addTaskHandler={this.addTaskHandler}
-                />
-                <div className="showTaskBoxes">
-                    {showTasks}
+            <Container>
+                <div className="todo-wrapper">
+                    <Row>
+                        <Col>
+                            <AddTask 
+                                addTaskHandler={this.addTaskHandler}
+                            />
+                        </Col>
+                    </Row>
+                    <Row className="d-flex justify-content-around">
+                        {showTasks}
+                    </Row>
                 </div>
-            </div>
+            </Container>
         )
     }
 }

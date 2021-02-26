@@ -1,10 +1,9 @@
 .box h3{
     text-align:center;
     position:relative;
-    top: 15px;
+    top: 30px;
 }
 .box {
-    width: 25%;
     margin-top: 10px;
     height: 100px;
     background:#FFF;

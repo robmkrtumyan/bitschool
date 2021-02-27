@@ -1,34 +1,5 @@
-.box h3{
-    text-align:center;
-    position:relative;
-    top: 30px;
-}
-.box {
-    margin-top: 10px;
-    height: 100px;
-    background:#FFF;
-}
-
-.task-box
-{
-    position:relative;
-    box-shadow:0 2px 15px rgba(0, 0, 0, 0.3), 0 0 10px rgba(0, 0, 0, 0.1) inset;
-}
-.task-box:before, .task-box:after
-{
-    content:"";
-    position:absolute;
-    z-index:-1;
-    box-shadow:0 0 15px rgba(0,0,0,0.4);
-    top:10px;
-    bottom:10px;
-    left:0;
-    right:0;
-    border-radius: 100px / 10px;
-}
-.task-box:after
-{
-    right:10px;
-    left:auto;
-    transform:skew(8deg) rotate(3deg);
+.icon-button{
+    width: 40px;
+    line-height: 10px;
+    height: 30px;
 }

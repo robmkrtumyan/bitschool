@@ -26,8 +26,9 @@ class AddTask extends Component {
     }
 
     render() {
+        const {selectedTaskCheck} = this.props
         return (
-            <Container>
+            <div>
                 <Row className="justify-content-md-center">
                     <Col md={12}>
                         <label htmlFor="new-task">Add Task</label>
@@ -42,12 +43,14 @@ class AddTask extends Component {
                                 onKeyPress={this.addHandler}
                                 onChange={this.changeInputHandler}
                                 value={this.state.inputValue}
+                                disabled={selectedTaskCheck}
                             />
                             <InputGroup.Append>
                                 <Button 
                                     variant="outline-secondary"
                                     className="todo-button"
                                     onClick={this.addHandler}
+                                    disabled={selectedTaskCheck}
                                 >
                                     Add
                                 </Button>
@@ -55,7 +58,7 @@ class AddTask extends Component {
                         </InputGroup>
                     </Col>
                 </Row>
-            </Container>
+            </div>
         )
     }
 }

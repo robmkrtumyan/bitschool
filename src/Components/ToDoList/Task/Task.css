@@ -3,3 +3,13 @@
     line-height: 10px;
     height: 30px;
 }
+
+.cardTask{
+    color: rgba(82,82,85);
+    margin-top: 10px;
+    background-image: linear-gradient(to right top, #36e92e, #44e232, rgb(79, 220, 54), #57d53a, #5ecf3e, #5ed14b, #5fd257, #61d462, #5fde78, #5de88d, #5df2a2, #5ffbb7);    
+}
+
+.checkedTask{
+    background: rgba(79,220, 54, .4);
+}

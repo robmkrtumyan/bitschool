@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { memo } from 'react'
 import { Card, Button } from 'react-bootstrap'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTrash, faEdit } from '@fortawesome/free-solid-svg-icons'
+import PropTypes from 'prop-types'
 import './Task.css'
 
 function Task(props) {
@@ -16,12 +17,12 @@ function Task(props) {
     const selTask = ['cardTask']
     if(selectedTask)
         selTask.push('checkedTask')
-
     return (
             <Card className={selTask.join(' ')}>
                 <input 
                     type="checkbox"
-                    onClick={() => checkedToggleHandler(task._id)}
+                    onChange={() => checkedToggleHandler(task._id)}
+                    checked={selectedTask}
                 />
                 <Card.Body>
                     <Card.Title className="text-center">{task.title}</Card.Title>
@@ -47,4 +48,15 @@ function Task(props) {
     )
 }
 
-export default Task
+Task.propTypes = {
+    tasks: PropTypes.shape({
+        _id: PropTypes.string.isRequired,
+        title: PropTypes.string.isRequired
+    }),
+    deleteTask: PropTypes.func.isRequired,
+    checkedToggleHandler: PropTypes.func.isRequired,
+    selectedTaskCheck: PropTypes.bool.isRequired,
+    selectedTask: PropTypes.bool.isRequired
+}
+
+export default memo(Task);

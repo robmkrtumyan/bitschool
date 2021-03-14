@@ -3,6 +3,7 @@ import { Container, Row, Col, Button } from 'react-bootstrap'
 import uuid from 'react-uuid'
 import AddTask from './AddTask/AddTask'
 import Task from './Task/Task'
+import withScreenSizes from '../HOC/withScreenSizes'
 import './ToDoList.css'
 
 class ToDoList extends Component {
@@ -44,15 +45,14 @@ class ToDoList extends Component {
     }
 
     checkedToggleHandler = (id) => {
-        // let selectedTasks = [...this.state.selectedTasks]
         let selectedTasks = new Set(this.state.selectedTasks)
         if(!selectedTasks.has(id)){
             selectedTasks.add(id)
         }
         else{
-            selectedTasks = selectedTasks.delete(selectedTaskId => selectedTaskId !== id)
+            selectedTasks.delete(id)
         }
-        this.setState({selectedTasks})
+        this.setState({ selectedTasks  })
     }
 
     deleteCheckedHandlerTasks = () => {
@@ -61,6 +61,21 @@ class ToDoList extends Component {
         this.setState({
             tasks,
             selectedTasks: new Set()
+        })
+    }
+
+    checkedAllHandler = () => {
+        const {tasks, selectedTasks} = this.state
+        let selectedTask = selectedTasks
+        if(tasks.length === selectedTask.size){
+            selectedTask.clear()
+        } else{
+            tasks.forEach( task => {
+                selectedTask.add(task._id)
+            })
+        }
+        this.setState({
+            selectedTasks: selectedTask
         })
     }
 
@@ -101,6 +116,14 @@ class ToDoList extends Component {
                         >
                             Delete All Checked Tasks
                         </Button>
+
+                        <Button 
+                            variant="primary"
+                            className="ml-5"
+                            onClick={this.checkedAllHandler}
+                        >
+                            {tasks.length === selectedTasks.size ? "Remove All" : "Check All"}
+                        </Button>
                     </Row>
                 </div>
             </Container>
@@ -108,4 +131,4 @@ class ToDoList extends Component {
     }
 }
 
-export default ToDoList
+export default withScreenSizes(ToDoList);

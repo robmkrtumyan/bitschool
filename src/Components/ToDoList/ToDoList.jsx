@@ -1,35 +1,54 @@
 import React, { Component } from 'react'
 import { Container, Row, Col, Button } from 'react-bootstrap'
 import uuid from 'react-uuid'
-import AddTask from './AddTask/AddTask'
 import Task from './Task/Task'
-import withScreenSizes from '../HOC/withScreenSizes'
 import './ToDoList.css'
+import AddTaskModal from './AddTaskModal/AddTaskModal'
+import Confirm from './DeleteConfirm/Confirm'
 
 class ToDoList extends Component {
     state = {
         tasks: [
             {
                 _id: uuid(),
-                title: "Task 1"
+                title: "Task 1",
+                description: "Task 1"
             },
             {
                 _id: uuid(),
-                title: "Task 2"
+                title: "Task 2",
+                description: "Task 2"
             },
             {
                 _id: uuid(),
-                title: "Task 3"
+                title: "Task 3",
+                description: "Task 3"
             }
         ],
-        selectedTasks: new Set()
+        selectedTasks: new Set(),
+        openToggleModal: false,
+        openToggleConfirm: false
     }
 
-    addTaskHandler = (value) => {
+    toggleOpenModal = () => {
+        const {openToggleModal} = this.state
+        this.setState({
+            openToggleModal: !openToggleModal
+        })
+    }
+
+    toggleOpenConfirm = () => {
+        const {openToggleConfirm} = this.state
+        this.setState({
+            openToggleConfirm: !openToggleConfirm
+        })
+    }
+
+    addTaskHandler = (formData) => {
         const tasks = [...this.state.tasks]
         tasks.push({
-            title: value,
-            _id: uuid()
+            _id: uuid(),
+            ...formData
         })
         this.setState({
             tasks,
@@ -65,7 +84,7 @@ class ToDoList extends Component {
     }
 
     checkedAllHandler = () => {
-        const {tasks, selectedTasks} = this.state
+        const { tasks, selectedTasks } = this.state
         let selectedTask = selectedTasks
         if(tasks.length === selectedTask.size){
             selectedTask.clear()
@@ -80,7 +99,12 @@ class ToDoList extends Component {
     }
 
     render() {
-        const {tasks, selectedTasks} = this.state
+        const {
+            tasks, 
+            selectedTasks, 
+            openToggleModal,
+            openToggleConfirm
+        } = this.state
         const showTasks = tasks.map( task => {
             return( 
                 <Col key={uuid()} md={3} lg={4}>
@@ -95,40 +119,56 @@ class ToDoList extends Component {
             )
         })
         return (
-            <Container>
-                <div className="todo-wrapper">
-                    <Row>
-                        <Col>
-                            <AddTask 
-                                addTaskHandler={this.addTaskHandler}
-                                selectedTaskCheck={!!selectedTasks.size}
-                            />
-                        </Col>
-                    </Row>
-                    <Row className="justify-content-around">
-                        {showTasks.length ? showTasks : <p>Not found any Tasks</p>}
-                    </Row>
-                    <Row  className="justify-content-center mt-3">
-                        <Button 
-                            variant="danger"
-                            onClick={this.deleteCheckedHandlerTasks}
-                            disabled={!!!selectedTasks.size}
-                        >
-                            Delete All Checked Tasks
-                        </Button>
+            <>
+                <Container>
+                    <div className="todo-wrapper">
+                        <Row>
+                            <Col className="d-flex justify-content-center">
+                                <Button
+                                    onClick={this.toggleOpenModal}
+                                >
+                                    Add New Task
+                                </Button>
+                            </Col>
+                        </Row>
+                        <Row className="justify-content-around">
+                            {showTasks.length ? showTasks : <p>Not found any Tasks</p>}
+                        </Row>
+                        <Row  className="justify-content-center mt-3">
+                            <Button 
+                                variant="danger"
+                                // 
+                                onClick={this.toggleOpenConfirm}
+                                disabled={!!!selectedTasks.size}
+                            >
+                                Delete All Checked Tasks
+                            </Button>
 
-                        <Button 
-                            variant="primary"
-                            className="ml-5"
-                            onClick={this.checkedAllHandler}
-                        >
-                            {tasks.length === selectedTasks.size ? "Remove All" : "Check All"}
-                        </Button>
-                    </Row>
-                </div>
-            </Container>
+                            <Button 
+                                variant="primary"
+                                className="ml-5"
+                                onClick={this.checkedAllHandler}
+                            >
+                                {tasks.length === selectedTasks.size ? "Remove All" : "Check All"}
+                            </Button>
+                        </Row>
+                    </div>
+                </Container>
+
+                { openToggleModal && <AddTaskModal
+                    onHide={this.toggleOpenModal}
+                    addTaskHandler={this.addTaskHandler}
+                    selectedTaskCheck={!!selectedTasks.size}
+                /> }
+
+                { openToggleConfirm && <Confirm
+                    count={selectedTasks.size}
+                    deleteConfirm={this.deleteCheckedHandlerTasks}
+                    onHide={this.toggleOpenConfirm}
+                />}
+            </>
         )
     }
 }
 
-export default withScreenSizes(ToDoList);
+export default ToDoList;

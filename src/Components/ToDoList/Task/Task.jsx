@@ -17,6 +17,7 @@ function Task(props) {
     const selTask = ['cardTask']
     if(selectedTask)
         selTask.push('checkedTask')
+
     return (
             <Card className={selTask.join(' ')}>
                 <input 
@@ -25,7 +26,8 @@ function Task(props) {
                     checked={selectedTask}
                 />
                 <Card.Body>
-                    <Card.Title className="text-center">{task.title}</Card.Title>
+                    <Card.Title className="text-center">Title: {task.title}</Card.Title>
+                    <Card.Text className="text-center">Description: {task.description}</Card.Text>
                         <div className="d-flex justify-content-center mt-3">
                             <Button
                                 variant="danger" 
@@ -51,7 +53,8 @@ function Task(props) {
 Task.propTypes = {
     tasks: PropTypes.shape({
         _id: PropTypes.string.isRequired,
-        title: PropTypes.string.isRequired
+        title: PropTypes.string.isRequired,
+        description: PropTypes.string.isRequired
     }),
     deleteTask: PropTypes.func.isRequired,
     checkedToggleHandler: PropTypes.func.isRequired,

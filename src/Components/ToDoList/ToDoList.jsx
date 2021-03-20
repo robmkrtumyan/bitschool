@@ -3,8 +3,8 @@ import { Container, Row, Col, Button } from 'react-bootstrap'
 import uuid from 'react-uuid'
 import Task from './Task/Task'
 import './ToDoList.css'
-import AddTaskModal from './AddTaskModal/AddTaskModal'
 import Confirm from './DeleteConfirm/Confirm'
+import TaskModal from './TaskModal/TaskModal'
 
 class ToDoList extends Component {
     state = {
@@ -27,7 +27,8 @@ class ToDoList extends Component {
         ],
         selectedTasks: new Set(),
         openToggleModal: false,
-        openToggleConfirm: false
+        openToggleConfirm: false,
+        editTask: null
     }
 
     toggleOpenModal = () => {
@@ -51,7 +52,7 @@ class ToDoList extends Component {
             ...formData
         })
         this.setState({
-            tasks,
+            tasks
         })
     }
 
@@ -98,12 +99,48 @@ class ToDoList extends Component {
         })
     }
 
+    getOneOfSelectedTasks = () => {
+        if(this.state.selectedTasks.size !== 1){
+            return
+        }
+        let id = null
+        this.state.selectedTasks.forEach(_id => {
+            id = _id
+        })
+
+        return this.state.tasks.find(task => task._id === id)
+    }
+
+    setEditTask = (editTask) => {
+        this.setState({
+            editTask
+        })
+    }
+
+    removeEditedTask = () => {
+        this.setState({
+            editTask: null
+        })
+    }
+
+    editTaskHandler = (editTask) => {
+        const tasks = [...this.state.tasks]
+        const taskIndex = tasks.findIndex(task => task._id === editTask._id)
+        tasks[taskIndex] = editTask
+        this.setState({
+            tasks
+        })
+    }
+
+
+
     render() {
         const {
             tasks, 
             selectedTasks, 
             openToggleModal,
-            openToggleConfirm
+            openToggleConfirm,
+            editTask
         } = this.state
         const showTasks = tasks.map( task => {
             return( 
@@ -114,6 +151,7 @@ class ToDoList extends Component {
                         checkedToggleHandler={this.checkedToggleHandler}
                         selectedTaskCheck={selectedTasks.has(task._id)}
                         selectedTask={selectedTasks.has(task._id)}
+                        setEditTask={this.setEditTask}
                     />
                 </Col>
             )
@@ -131,13 +169,12 @@ class ToDoList extends Component {
                                 </Button>
                             </Col>
                         </Row>
-                        <Row className="justify-content-around">
+                        <Row className="justify-content-around mt-4">
                             {showTasks.length ? showTasks : <p>Not found any Tasks</p>}
                         </Row>
                         <Row  className="justify-content-center mt-3">
                             <Button 
                                 variant="danger"
-                                // 
                                 onClick={this.toggleOpenConfirm}
                                 disabled={!!!selectedTasks.size}
                             >
@@ -148,21 +185,27 @@ class ToDoList extends Component {
                                 variant="primary"
                                 className="ml-5"
                                 onClick={this.checkedAllHandler}
+                                disabled={!!!tasks.length}
                             >
-                                {tasks.length === selectedTasks.size ? "Remove All" : "Check All"}
+                                {selectedTasks.size && tasks.length === selectedTasks.size ? "Remove All" : "Check All"}
                             </Button>
                         </Row>
                     </div>
                 </Container>
 
-                { openToggleModal && <AddTaskModal
+                { openToggleModal && <TaskModal
                     onHide={this.toggleOpenModal}
-                    addTaskHandler={this.addTaskHandler}
-                    selectedTaskCheck={!!selectedTasks.size}
+                    onSubmit={this.addTaskHandler}
+                /> }
+
+                { editTask && <TaskModal
+                    onHide={this.removeEditedTask}
+                    editTask={editTask}
+                    onSubmit={this.editTaskHandler}
                 /> }
 
                 { openToggleConfirm && <Confirm
-                    count={selectedTasks.size}
+                    taskCountOrTitle={selectedTasks.size > 1 ? selectedTasks.size : this.getOneOfSelectedTasks().title}
                     deleteConfirm={this.deleteCheckedHandlerTasks}
                     onHide={this.toggleOpenConfirm}
                 />}

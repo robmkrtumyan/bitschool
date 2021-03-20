@@ -1,13 +1,14 @@
 import React, { Component } from 'react'
 import { Modal, Form, FormControl, Button } from 'react-bootstrap'
 
-class AddTaskModal extends Component {
+class TaskModal extends Component {
     constructor(props) {
         super(props)
     
         this.state = {
             title: "",
-            description: ""
+            description: "",
+            ...props.editTask
         }
 
         this.inputFocus = React.createRef()
@@ -25,23 +26,18 @@ class AddTaskModal extends Component {
     }
 
     addHandler = (event) => {
-        const { onHide, addTaskHandler } = this.props
+        const { onHide, onSubmit } = this.props
         const { title, description } = this.state
         const {key, type} = event
         if(!title || !description || (type === "keypress" && key !== "Enter"))
             return
 
-        const formData = {
-            title, 
-            description
-        }
-
-        addTaskHandler(formData)
+        onSubmit(this.state)
         onHide()
     }
 
     render() {
-        const { onHide, selectedTaskCheck } = this.props
+        const { onHide, editTask } = this.props
         const { title, description } = this.state
         return (
             <Modal
@@ -53,7 +49,7 @@ class AddTaskModal extends Component {
             >
                 <Modal.Header closeButton>
                     <Modal.Title id="contained-modal-title-vcenter">
-                        Add Task
+                        {editTask ? "Edit Task" : "Add Task"}
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
@@ -67,7 +63,6 @@ class AddTaskModal extends Component {
                                 onKeyPress={this.addHandler}
                                 onChange={this.changeInputHandler}
                                 value={title}
-                                disabled={selectedTaskCheck}
                             />
                             </Form.Group>
                             <Form.Group>
@@ -89,9 +84,9 @@ class AddTaskModal extends Component {
                     <Button 
                         variant="primary"
                         onClick={this.addHandler}
-                        disabled={selectedTaskCheck || !title || !description}
+                        disabled={!title || !description}
                     >
-                        Add
+                        {editTask ? "Save": "Add Task"}
                     </Button>
                 </Modal.Footer>
             </Modal>
@@ -99,4 +94,4 @@ class AddTaskModal extends Component {
     }
 }
 
-export default AddTaskModal
+export default TaskModal

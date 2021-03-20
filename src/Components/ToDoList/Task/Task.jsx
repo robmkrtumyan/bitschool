@@ -10,8 +10,8 @@ function Task(props) {
         task, 
         deleteTask, 
         checkedToggleHandler, 
-        selectedTaskCheck,
-        selectedTask
+        selectedTask,
+        setEditTask
     } = props
 
     const selTask = ['cardTask']
@@ -33,14 +33,13 @@ function Task(props) {
                                 variant="danger" 
                                 className="icon-button"
                                 onClick={() => deleteTask(task._id)}
-                                disabled={selectedTaskCheck}
                             >
                                 <FontAwesomeIcon icon={faTrash} />
                             </Button>
                             <Button 
                                 variant="warning" 
                                 className="icon-button ml-2 mb-2"
-                                disabled={selectedTaskCheck}
+                                onClick={() => setEditTask(task)}
                             >
                                 <FontAwesomeIcon icon={faEdit} />
                             </Button>

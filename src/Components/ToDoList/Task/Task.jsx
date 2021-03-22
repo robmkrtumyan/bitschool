@@ -27,7 +27,8 @@ function Task(props) {
                 />
                 <Card.Body>
                     <Card.Title className="text-center">Title: {task.title}</Card.Title>
-                    <Card.Text className="text-center">Description: {task.description}</Card.Text>
+                    <Card.Text className="text-center">Desc.: {task.description}</Card.Text>
+                    <Card.Text className="text-center">Date: {task.date.slice(0, 10)}</Card.Text>
                         <div className="d-flex justify-content-center mt-3">
                             <Button
                                 variant="danger" 

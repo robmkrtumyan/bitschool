@@ -6,25 +6,11 @@ import './ToDoList.css'
 import Confirm from './DeleteConfirm/Confirm'
 import TaskModal from './TaskModal/TaskModal'
 
+const API_HOST = "http://localhost:3001"
+
 class ToDoList extends Component {
     state = {
-        tasks: [
-            {
-                _id: uuid(),
-                title: "Task 1",
-                description: "Task 1"
-            },
-            {
-                _id: uuid(),
-                title: "Task 2",
-                description: "Task 2"
-            },
-            {
-                _id: uuid(),
-                title: "Task 3",
-                description: "Task 3"
-            }
-        ],
+        tasks: [ ],
         selectedTasks: new Set(),
         openToggleModal: false,
         openToggleConfirm: false,
@@ -46,22 +32,49 @@ class ToDoList extends Component {
     }
 
     addTaskHandler = (formData) => {
-        const tasks = [...this.state.tasks]
-        tasks.push({
-            _id: uuid(),
-            ...formData
+        console.log("Form Data", formData)
+        fetch(`${API_HOST}/task`, {
+            method:"POST",
+            body:JSON.stringify(formData),
+            headers: {
+                "Content-Type": "application/json"
+            }
         })
-        this.setState({
-            tasks
+        .then(res => res.json())
+        .then(data => {
+            if(data.error)
+                throw data.error
+            const tasks = [...this.state.tasks]
+            tasks.push(data)
+            this.setState({
+                tasks
+            })
+        })
+        .catch(error => {
+            console.log("Error", error)
         })
     }
 
     deleteTaskHandler = (_id) => {
-        let tasks = [...this.state.tasks]
-        tasks = tasks.filter(task => task._id !== _id)
-        this.setState({
-            tasks
-        })
+        (async () => {
+            try{
+            const response = await fetch(`${API_HOST}/task/${_id}`, {
+                method: "DELETE"
+            })
+            const data = await response.json()
+            if(data.error) 
+                throw data.error
+
+            let tasks = [...this.state.tasks]
+            tasks = tasks.filter(task => task._id !== _id)
+            this.setState({
+                tasks
+            })
+            }
+            catch(error){
+                console.log("Error request", error)
+            }
+        })()
     }
 
     checkedToggleHandler = (id) => {
@@ -76,11 +89,28 @@ class ToDoList extends Component {
     }
 
     deleteCheckedHandlerTasks = () => {
-        let tasks = [...this.state.tasks]
-        tasks = tasks.filter(task => !this.state.selectedTasks.has(task._id))
-        this.setState({
-            tasks,
-            selectedTasks: new Set()
+        const {selectedTasks} = this.state
+        fetch(`${API_HOST}/task`, {
+            method:"PATCH",
+            body:JSON.stringify({ tasks: Array.from(selectedTasks) }),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+
+        .then(res => res.json())
+        .then(data => {
+            if(data.error)
+                throw data.error
+                let tasks = [...this.state.tasks]
+                tasks = tasks.filter(task => !this.state.selectedTasks.has(task._id))
+                this.setState({
+                    tasks,
+                    selectedTasks: new Set()
+                })
+        })
+        .catch(error=>{
+            console.log("Error", error)
         })
     }
 
@@ -112,6 +142,17 @@ class ToDoList extends Component {
     }
 
     setEditTask = (editTask) => {
+        fetch(`${API_HOST}/task`, {
+            method:"PUT",
+            body:JSON.stringify(),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log("Updated Data", data)
+        })
         this.setState({
             editTask
         })
@@ -124,15 +165,36 @@ class ToDoList extends Component {
     }
 
     editTaskHandler = (editTask) => {
-        const tasks = [...this.state.tasks]
-        const taskIndex = tasks.findIndex(task => task._id === editTask._id)
-        tasks[taskIndex] = editTask
-        this.setState({
-            tasks
-        })
+        (async () => {
+            const { _id } = editTask
+            const response = await fetch(`${API_HOST}/task/${_id}`, {
+                method: "PUT",
+                body: JSON.stringify(editTask),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+
+            const data = await response.json()
+            const tasks = [...this.state.tasks]
+            const taskIndex = tasks.findIndex(task => task._id === data._id)
+            tasks[taskIndex] = data
+            this.setState({
+                tasks
+            })
+            
+        })()
     }
 
-
+    componentDidMount(){
+        fetch(`${API_HOST}/task`)
+        .then(res => res.json())
+        .then(data => {
+            this.setState({
+                tasks: data
+            })
+        })
+    }
 
     render() {
         const {

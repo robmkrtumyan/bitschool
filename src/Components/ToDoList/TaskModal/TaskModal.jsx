@@ -1,14 +1,17 @@
 import React, { Component } from 'react'
 import { Modal, Form, FormControl, Button } from 'react-bootstrap'
+import DatePicker from 'react-datepicker'
 
 class TaskModal extends Component {
+
     constructor(props) {
         super(props)
     
         this.state = {
             title: "",
             description: "",
-            ...props.editTask
+            ...props.editTask,
+            date: props.editTask ? new Date(props.editTask.date): new Date()
         }
 
         this.inputFocus = React.createRef()
@@ -27,18 +30,29 @@ class TaskModal extends Component {
 
     addHandler = (event) => {
         const { onHide, onSubmit } = this.props
-        const { title, description } = this.state
+        const { title, description, date } = this.state
         const {key, type} = event
         if(!title || !description || (type === "keypress" && key !== "Enter"))
             return
-
-        onSubmit(this.state)
+        
+        const formData = {
+            ...this.state,
+            date: date.toISOString(date).slice(0, 10)
+        }
+        
+        onSubmit(formData)
         onHide()
+    }
+
+    setDate = (date) => {
+        this.setDate({
+            date
+        })
     }
 
     render() {
         const { onHide, editTask } = this.props
-        const { title, description } = this.state
+        const { title, description, date } = this.state
         return (
             <Modal
                 show={true}
@@ -55,15 +69,15 @@ class TaskModal extends Component {
                 <Modal.Body>
                 <Form className="mb-3" onSubmit={this.formSubmit}>
                             <Form.Group>
-                            <FormControl
-                                name="title"
-                                ref={this.inputFocus}
-                                className="new-task"
-                                placeholder="Add Title"
-                                onKeyPress={this.addHandler}
-                                onChange={this.changeInputHandler}
-                                value={title}
-                            />
+                                <FormControl
+                                    name="title"
+                                    ref={this.inputFocus}
+                                    className="new-task"
+                                    placeholder="Add Title"
+                                    onKeyPress={this.addHandler}
+                                    onChange={this.changeInputHandler}
+                                    value={title}
+                                />
                             </Form.Group>
                             <Form.Group>
                                 <Form.Control 
@@ -77,10 +91,16 @@ class TaskModal extends Component {
                                     rows={3} 
                                 />
                             </Form.Group>
+                            <Form.Group>
+                                <DatePicker 
+                                    selected={date} 
+                                    onChange={date => this.setDate(date)}
+                                />
+                            </Form.Group>
                         </Form>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button onClick={onHide} variant="secondary">Close</Button>
+                    <Button onClick={(event) => onHide()} variant="secondary">Close</Button>
                     <Button 
                         variant="primary"
                         onClick={this.addHandler}

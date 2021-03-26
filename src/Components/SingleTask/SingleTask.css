@@ -1,0 +1,15 @@
+.singleTask_wrapper{
+    width: 350px;
+    min-height: 350px;
+    margin: 2% auto;
+    padding: 10px;
+    color: rgb(202, 242, 191);
+    box-sizing: border-box;
+    background-image: linear-gradient(to right top, #36e92e, #44e232, rgb(79, 220, 54), #57d53a, #5ecf3e, #5ed14b, #5fd257, #61d462, #5fde78, #5de88d, #5df2a2, #5ffbb7);    
+    border: 1px solid rgb(10, 128, 59);
+    text-align: center;
+}
+
+.singleTask_wrapper h3:first-child{
+    margin-top: 35%;
+}

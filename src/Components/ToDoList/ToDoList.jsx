@@ -5,6 +5,7 @@ import Task from './Task/Task'
 import './ToDoList.css'
 import Confirm from './DeleteConfirm/Confirm'
 import TaskModal from './TaskModal/TaskModal'
+import Spinner from '../Spinner/Spinner'
 
 const API_HOST = "http://localhost:3001"
 
@@ -14,7 +15,8 @@ class ToDoList extends Component {
         selectedTasks: new Set(),
         openToggleModal: false,
         openToggleConfirm: false,
-        editTask: null
+        editTask: null,
+        loading: false
     }
 
     toggleOpenModal = () => {
@@ -32,7 +34,9 @@ class ToDoList extends Component {
     }
 
     addTaskHandler = (formData) => {
-        console.log("Form Data", formData)
+        this.setState({
+            loading: true
+        })
         fetch(`${API_HOST}/task`, {
             method:"POST",
             body:JSON.stringify(formData),
@@ -47,16 +51,25 @@ class ToDoList extends Component {
             const tasks = [...this.state.tasks]
             tasks.push(data)
             this.setState({
-                tasks
+                tasks,
+                openToggleModal: false
             })
         })
         .catch(error => {
             console.log("Error", error)
         })
+        .finally(() => {
+            this.setState({
+                loading: false
+            })
+        })
     }
 
     deleteTaskHandler = (_id) => {
         (async () => {
+            this.setState({
+                loading: true
+            })
             try{
             const response = await fetch(`${API_HOST}/task/${_id}`, {
                 method: "DELETE"
@@ -74,6 +87,11 @@ class ToDoList extends Component {
             catch(error){
                 console.log("Error request", error)
             }
+            finally{
+                this.setState({
+                    loading: false
+                })
+            }
         })()
     }
 
@@ -89,6 +107,9 @@ class ToDoList extends Component {
     }
 
     deleteCheckedHandlerTasks = () => {
+        this.setState({
+            loading: true
+        })
         const {selectedTasks} = this.state
         fetch(`${API_HOST}/task`, {
             method:"PATCH",
@@ -97,7 +118,6 @@ class ToDoList extends Component {
                 "Content-Type": "application/json"
             }
         })
-
         .then(res => res.json())
         .then(data => {
             if(data.error)
@@ -111,6 +131,11 @@ class ToDoList extends Component {
         })
         .catch(error=>{
             console.log("Error", error)
+        })
+        .finally(() => {
+            this.setState({
+                loading: false
+            })
         })
     }
 
@@ -166,23 +191,38 @@ class ToDoList extends Component {
 
     editTaskHandler = (editTask) => {
         (async () => {
-            const { _id } = editTask
-            const response = await fetch(`${API_HOST}/task/${_id}`, {
-                method: "PUT",
-                body: JSON.stringify(editTask),
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            })
-
-            const data = await response.json()
-            const tasks = [...this.state.tasks]
-            const taskIndex = tasks.findIndex(task => task._id === data._id)
-            tasks[taskIndex] = data
             this.setState({
-                tasks
+                loading: true
             })
-            
+            try{
+                const { _id } = editTask
+                const response = await fetch(`${API_HOST}/task/${_id}`, {
+                    method: "PUT",
+                    body: JSON.stringify(editTask),
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                })
+
+                const data = await response.json()
+                if(data.error)
+                    throw data.error
+                const tasks = [...this.state.tasks]
+                const taskIndex = tasks.findIndex(task => task._id === data._id)
+                tasks[taskIndex] = data
+                this.setState({
+                    tasks,
+                    editTask: null
+                })
+            }
+            catch(error) {
+                console.log("Error", error)
+            }
+            finally{
+                this.setState({
+                    loading: false
+                })
+            }            
         })()
     }
 
@@ -202,7 +242,8 @@ class ToDoList extends Component {
             selectedTasks, 
             openToggleModal,
             openToggleConfirm,
-            editTask
+            editTask,
+            loading
         } = this.state
         const showTasks = tasks.map( task => {
             return( 
@@ -254,6 +295,9 @@ class ToDoList extends Component {
                         </Row>
                     </div>
                 </Container>
+                {
+                    loading && <Spinner />
+                }
 
                 { openToggleModal && <TaskModal
                     onHide={this.toggleOpenModal}

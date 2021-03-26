@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { Modal, Form, FormControl, Button } from 'react-bootstrap'
+import PropTypes from 'prop-types'
 import DatePicker from 'react-datepicker'
 
 class TaskModal extends Component {
@@ -112,6 +113,12 @@ class TaskModal extends Component {
             </Modal>
         )
     }
+}
+
+TaskModal.propType = {
+    onHide: PropTypes.func.isRequired,
+    editTask: PropTypes.object,
+    onSubmit: PropTypes.func.isRequired
 }
 
 export default TaskModal

@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTrash, faEdit } from '@fortawesome/free-solid-svg-icons'
 import PropTypes from 'prop-types'
 import './Task.css'
+import { Link } from 'react-router-dom'
 
 function Task(props) {
     const {
@@ -26,7 +27,9 @@ function Task(props) {
                     checked={selectedTask}
                 />
                 <Card.Body>
-                    <Card.Title className="text-center">Title: {task.title}</Card.Title>
+                    <Card.Title className="text-center">
+                        <Link to={`/task/${task._id}`}>Title: {task.title}</Link>
+                    </Card.Title>
                     <Card.Text className="text-center">Desc.: {task.description}</Card.Text>
                     <Card.Text className="text-center">Date: {task.date.slice(0, 10)}</Card.Text>
                         <div className="d-flex justify-content-center mt-3">

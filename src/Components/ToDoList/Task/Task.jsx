@@ -5,6 +5,7 @@ import { faTrash, faEdit } from '@fortawesome/free-solid-svg-icons'
 import PropTypes from 'prop-types'
 import './Task.css'
 import { Link } from 'react-router-dom'
+import DeleteSpinner from '../../DeleteSpinner/DeleteSpinner'
 
 function Task(props) {
     const {
@@ -12,13 +13,19 @@ function Task(props) {
         deleteTask, 
         checkedToggleHandler, 
         selectedTask,
-        setEditTask
+        setEditTask,
+        showDeleteLoader
     } = props
 
     const selTask = ['cardTask']
     if(selectedTask)
         selTask.push('checkedTask')
 
+
+    if(showDeleteLoader) {
+        return <DeleteSpinner />
+    }
+    
     return (
             <Card className={selTask.join(' ')}>
                 <input 

@@ -16,7 +16,8 @@ class ToDoList extends Component {
         openToggleModal: false,
         openToggleConfirm: false,
         editTask: null,
-        loading: false
+        loading: false,
+        deleteLoader: null
     }
 
     toggleOpenModal = () => {
@@ -68,7 +69,7 @@ class ToDoList extends Component {
     deleteTaskHandler = (_id) => {
         (async () => {
             this.setState({
-                loading: true
+                deleteLoader: _id
             })
             try{
             const response = await fetch(`${API_HOST}/task/${_id}`, {
@@ -89,7 +90,7 @@ class ToDoList extends Component {
             }
             finally{
                 this.setState({
-                    loading: false
+                    deleteLoader: null
                 })
             }
         })()
@@ -227,11 +228,19 @@ class ToDoList extends Component {
     }
 
     componentDidMount(){
+        this.setState({
+            loading: true
+        })
         fetch(`${API_HOST}/task`)
         .then(res => res.json())
         .then(data => {
             this.setState({
                 tasks: data
+            })
+        })
+        .finally(() => {
+            this.setState({
+                loading:false
             })
         })
     }
@@ -243,7 +252,8 @@ class ToDoList extends Component {
             openToggleModal,
             openToggleConfirm,
             editTask,
-            loading
+            loading,
+            deleteLoader
         } = this.state
         const showTasks = tasks.map( task => {
             return( 
@@ -255,6 +265,7 @@ class ToDoList extends Component {
                         selectedTaskCheck={selectedTasks.has(task._id)}
                         selectedTask={selectedTasks.has(task._id)}
                         setEditTask={this.setEditTask}
+                        showDeleteLoader={deleteLoader === task._id}
                     />
                 </Col>
             )

@@ -5,6 +5,7 @@ import { faTrash, faEdit } from '@fortawesome/free-solid-svg-icons'
 import './SingleTask.css'
 import TaskModal from '../ToDoList/TaskModal/TaskModal'
 import Spinner from '../Spinner/Spinner'
+import { Link } from 'react-router-dom'
 
 
 const API_HOST = "http://localhost:3001"
@@ -36,13 +37,11 @@ class SingleTask extends Component {
             this.props.history.push("/")
         })
         .catch(error => {
-            console.log("Error", error)
-        })    
-        .finally(() =>{
             this.setState({
                 loading: false
             })
-        })    
+            console.log("Error", error)
+        })      
     }
     
     editSingleTask = (editTask) => {
@@ -65,12 +64,10 @@ class SingleTask extends Component {
             })
         })
         .catch(error => {
-            console.log("Error", error)
-        })
-        .finally(() =>{
             this.setState({
                 loading:false
             })
+            console.log("Error", error)
         })
     }
 
@@ -98,9 +95,9 @@ class SingleTask extends Component {
 
     render() {
         const {singleTask, editTask, loading} = this.state
-        if(!singleTask) return <p>Loading...</p>
+        if(!singleTask || loading) return <Spinner />
         return (
-            <>
+            <div>
                 <div>
                     <h2 className="d-flex justify-content-center mt-5">Single Task</h2>
                     <div className="singleTask_wrapper rounded-circle">
@@ -122,6 +119,9 @@ class SingleTask extends Component {
                                 <FontAwesomeIcon icon={faEdit} />
                             </Button>
                         </div>
+                        <div>
+                            <Link to="/">Back Home</Link>
+                        </div>
                     </div>       
                 </div>
 
@@ -136,7 +136,7 @@ class SingleTask extends Component {
                 {
                     loading && <Spinner />
                 }
-            </>
+            </div>
         )
     }
 }

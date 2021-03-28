@@ -1,0 +1,30 @@
+.form_wrapper{
+    width: 700px;
+    margin: 10% auto;
+    padding: 15px;
+    border: 1px solid rgb(115, 206, 248);
+    border-radius: 15px;
+    background-color: rgb(115, 206, 248);
+}
+
+.submit_btn{
+    width: 120px;
+    padding: 5px;
+    font-size: 17px;
+}
+.form-group:first-child{
+    margin-top: 5%;
+}
+.form-label{
+    font-size: 18px;
+    font-style: italic;
+    font-weight: bold;
+    padding-left: 3%;
+}
+textarea{
+    resize: none;
+}
+
+textarea.form-control{
+    height: 110px;
+}

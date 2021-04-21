@@ -64,10 +64,12 @@ class SingleTask extends Component {
             })
         })
         .catch(error => {
+            console.log("Error", error)
+        })
+        .finally(() => {
             this.setState({
                 loading:false
             })
-            console.log("Error", error)
         })
     }
 

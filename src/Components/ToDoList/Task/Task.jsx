@@ -30,15 +30,16 @@ function Task(props) {
             <Card className={selTask.join(' ')}>
                 <input 
                     type="checkbox"
+                    className="checkbox-btn"
                     onChange={() => checkedToggleHandler(task._id)}
                     checked={selectedTask}
                 />
                 <Card.Body>
                     <Card.Title className="text-center">
-                        <Link to={`/task/${task._id}`}>Title: {task.title}</Link>
+                        <Link to={`/task/${task._id}`} className="task-link">Title: {task.title}</Link>
                     </Card.Title>
-                    <Card.Text className="text-center">Desc.: {task.description}</Card.Text>
-                    <Card.Text className="text-center">Date: {task.date.slice(0, 10)}</Card.Text>
+                    <Card.Text className="text-center task-text">Desc.: {task.description}</Card.Text>
+                    <Card.Text className="text-center task-text">Date: {task.date.slice(0, 10)}</Card.Text>
                         <div className="d-flex justify-content-center mt-3">
                             <Button
                                 variant="danger" 

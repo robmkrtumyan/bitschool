@@ -1,275 +1,61 @@
 import React, { Component } from 'react'
 import { Container, Row, Col, Button } from 'react-bootstrap'
+import types from '../Redux/actionTypes'
 import uuid from 'react-uuid'
 import Task from './Task/Task'
 import './ToDoList.css'
 import Confirm from './DeleteConfirm/Confirm'
 import TaskModal from './TaskModal/TaskModal'
 import Spinner from '../Spinner/Spinner'
+import {connect} from 'react-redux'
+import {
+    setTasksThunk, 
+    addTaskThunk, 
+    deleteTaskThunk, 
+    deleteCheckedHandlerTasksThunk, 
+    editTaskHandlerThunk
+} from '../Redux/action'
 
-const API_HOST = "http://localhost:3001"
-
-class ToDoList extends Component {
-    state = {
-        tasks: [ ],
-        selectedTasks: new Set(),
-        openToggleModal: false,
-        openToggleConfirm: false,
-        editTask: null,
-        loading: false,
-        deleteLoader: null
-    }
-
-    toggleOpenModal = () => {
-        const {openToggleModal} = this.state
-        this.setState({
-            openToggleModal: !openToggleModal
-        })
-    }
-
-    toggleOpenConfirm = () => {
-        const {openToggleConfirm} = this.state
-        this.setState({
-            openToggleConfirm: !openToggleConfirm
-        })
-    }
-
-    addTaskHandler = (formData) => {
-        this.setState({
-            loading: true
-        })
-        fetch(`${API_HOST}/task`, {
-            method:"POST",
-            body:JSON.stringify(formData),
-            headers: {
-                "Content-Type": "application/json"
-            }
-        })
-        .then(res => res.json())
-        .then(data => {
-            if(data.error)
-                throw data.error
-            const tasks = [...this.state.tasks]
-            tasks.push(data)
-            this.setState({
-                tasks,
-                openToggleModal: false
-            })
-        })
-        .catch(error => {
-            console.log("Error", error)
-        })
-        .finally(() => {
-            this.setState({
-                loading: false
-            })
-        })
-    }
-
-    deleteTaskHandler = (_id) => {
-        (async () => {
-            this.setState({
-                deleteLoader: _id
-            })
-            try{
-            const response = await fetch(`${API_HOST}/task/${_id}`, {
-                method: "DELETE"
-            })
-            const data = await response.json()
-            if(data.error) 
-                throw data.error
-
-            let tasks = [...this.state.tasks]
-            tasks = tasks.filter(task => task._id !== _id)
-            this.setState({
-                tasks
-            })
-            }
-            catch(error){
-                console.log("Error request", error)
-            }
-            finally{
-                this.setState({
-                    deleteLoader: null
-                })
-            }
-        })()
-    }
-
-    checkedToggleHandler = (id) => {
-        let selectedTasks = new Set(this.state.selectedTasks)
-        if(!selectedTasks.has(id)){
-            selectedTasks.add(id)
-        }
-        else{
-            selectedTasks.delete(id)
-        }
-        this.setState({ selectedTasks  })
-    }
-
-    deleteCheckedHandlerTasks = () => {
-        this.setState({
-            loading: true
-        })
-        const {selectedTasks} = this.state
-        fetch(`${API_HOST}/task`, {
-            method:"PATCH",
-            body:JSON.stringify({ tasks: Array.from(selectedTasks) }),
-            headers: {
-                "Content-Type": "application/json"
-            }
-        })
-        .then(res => res.json())
-        .then(data => {
-            if(data.error)
-                throw data.error
-                let tasks = [...this.state.tasks]
-                tasks = tasks.filter(task => !this.state.selectedTasks.has(task._id))
-                this.setState({
-                    tasks,
-                    selectedTasks: new Set()
-                })
-        })
-        .catch(error=>{
-            console.log("Error", error)
-        })
-        .finally(() => {
-            this.setState({
-                loading: false
-            })
-        })
-    }
-
-    checkedAllHandler = () => {
-        const { tasks, selectedTasks } = this.state
-        let selectedTask = selectedTasks
-        if(tasks.length === selectedTask.size){
-            selectedTask.clear()
-        } else{
-            tasks.forEach( task => {
-                selectedTask.add(task._id)
-            })
-        }
-        this.setState({
-            selectedTasks: selectedTask
-        })
-    }
-
-    getOneOfSelectedTasks = () => {
-        if(this.state.selectedTasks.size !== 1){
-            return
-        }
-        let id = null
-        this.state.selectedTasks.forEach(_id => {
-            id = _id
-        })
-
-        return this.state.tasks.find(task => task._id === id)
-    }
-
-    setEditTask = (editTask) => {
-        fetch(`${API_HOST}/task`, {
-            method:"PUT",
-            body:JSON.stringify(),
-            headers: {
-                "Content-Type": "application/json"
-            }
-        })
-        .then(res => res.json())
-        .then(data => {
-            console.log("Updated Data", data)
-        })
-        this.setState({
-            editTask
-        })
-    }
-
-    removeEditedTask = () => {
-        this.setState({
-            editTask: null
-        })
-    }
-
-    editTaskHandler = (editTask) => {
-        (async () => {
-            this.setState({
-                loading: true
-            })
-            try{
-                const { _id } = editTask
-                const response = await fetch(`${API_HOST}/task/${_id}`, {
-                    method: "PUT",
-                    body: JSON.stringify(editTask),
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
-                })
-
-                const data = await response.json()
-                if(data.error)
-                    throw data.error
-                const tasks = [...this.state.tasks]
-                const taskIndex = tasks.findIndex(task => task._id === data._id)
-                tasks[taskIndex] = data
-                this.setState({
-                    tasks,
-                    editTask: null
-                })
-            }
-            catch(error) {
-                console.log("Error", error)
-            }
-            finally{
-                this.setState({
-                    loading: false
-                })
-            }            
-        })()
-    }
+class ToDoList extends Component {    
 
     componentDidMount(){
-        this.setState({
-            loading: true
-        })
-        fetch(`${API_HOST}/task`)
-        .then(res => res.json())
-        .then(data => {
-            this.setState({
-                tasks: data
-            })
-        })
-        .finally(() => {
-            this.setState({
-                loading:false
-            })
-        })
+        this.props.setTasks()
     }
 
     render() {
-        const {
+        const { 
             tasks, 
+            loading, 
+            deleteLoader, 
+            openToggleModal, 
+            openToggleConfirm, 
+            toggleOpenModal, 
+            toggleOpenConfirm, 
             selectedTasks, 
-            openToggleModal,
-            openToggleConfirm,
-            editTask,
-            loading,
-            deleteLoader
-        } = this.state
+            toggleSelectedTasks, 
+            oneSelectedTask, 
+            toggleCheckTasks, 
+            editTask, 
+            editTaskHandler, 
+            setEditTasks 
+        } = this.props
+
         const showTasks = tasks.map( task => {
             return( 
                 <Col key={uuid()} md={3} lg={4}>
                     <Task 
                         task={task} 
-                        deleteTask={this.deleteTaskHandler}
-                        checkedToggleHandler={this.checkedToggleHandler}
+                        deleteTask={this.props.deleteOneTask}
+                        checkedToggleHandler={toggleSelectedTasks}
                         selectedTaskCheck={selectedTasks.has(task._id)}
                         selectedTask={selectedTasks.has(task._id)}
-                        setEditTask={this.setEditTask}
+                        setEditTask={setEditTasks}
                         showDeleteLoader={deleteLoader === task._id}
                     />
                 </Col>
             )
         })
+
         return (
             <>
                 <Container>
@@ -277,7 +63,7 @@ class ToDoList extends Component {
                         <Row>
                             <Col className="d-flex justify-content-center">
                                 <Button
-                                    onClick={this.toggleOpenModal}
+                                    onClick={toggleOpenModal}
                                 >
                                     Add New Task
                                 </Button>
@@ -289,7 +75,7 @@ class ToDoList extends Component {
                         <Row  className="justify-content-center mt-3">
                             <Button 
                                 variant="danger"
-                                onClick={this.toggleOpenConfirm}
+                                onClick={toggleOpenConfirm}
                                 disabled={!!!selectedTasks.size}
                             >
                                 Delete All Checked Tasks
@@ -298,7 +84,7 @@ class ToDoList extends Component {
                             <Button 
                                 variant="primary"
                                 className="ml-5"
-                                onClick={this.checkedAllHandler}
+                                onClick={toggleCheckTasks}
                                 disabled={!!!tasks.length}
                             >
                                 {selectedTasks.size && tasks.length === selectedTasks.size ? "Remove All" : "Check All"}
@@ -311,24 +97,87 @@ class ToDoList extends Component {
                 }
 
                 { openToggleModal && <TaskModal
-                    onHide={this.toggleOpenModal}
-                    onSubmit={this.addTaskHandler}
+                    onHide={toggleOpenModal}
+                    onSubmit={this.props.addTask}
                 /> }
 
                 { editTask && <TaskModal
-                    onHide={this.removeEditedTask}
+                    onHide={setEditTasks}
                     editTask={editTask}
-                    onSubmit={this.editTaskHandler}
+                    onSubmit={editTaskHandler}
                 /> }
 
                 { openToggleConfirm && <Confirm
-                    taskCountOrTitle={selectedTasks.size > 1 ? selectedTasks.size : this.getOneOfSelectedTasks().title}
-                    deleteConfirm={this.deleteCheckedHandlerTasks}
-                    onHide={this.toggleOpenConfirm}
+                    taskCountOrTitle={oneSelectedTask ? oneSelectedTask.title : selectedTasks.size}
+                    deleteConfirm={() => this.props.deleteCheckedTasks(selectedTasks)}
+                    onHide={toggleOpenConfirm}
                 />}
             </>
         )
     }
 }
 
-export default ToDoList;
+const mapStateToProps = (state) => {
+    return {
+        tasks: state.todoState.tasks,
+        loading: state.globalState.loading,
+        deleteLoader: state.todoState.deleteLoader,
+        openToggleModal: state.todoState.openToggleModal,
+        openToggleConfirm: state.todoState.openToggleConfirm,
+        selectedTasks: state.todoState.selectedTasks,
+        oneSelectedTask: state.todoState.oneSelectedTask,
+        editTask: state.todoState.editTask
+    }
+}
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        setTasks: () => {
+            dispatch(setTasksThunk)
+        },
+
+        deleteOneTask: (_id) => {
+            dispatch((dispatch) => deleteTaskThunk(dispatch, _id))
+        },
+
+        turnOnOffLoading: (isLoading) => {
+            dispatch({ type: types.TURN_ON_OFF_LOADING, isLoading})
+        },
+
+        deleteTaskLoaderSpinner: (_id) => {
+            dispatch({ type: types.DELETE_LOADER_SPINNER, _id})
+        },
+
+        toggleOpenModal: () => {
+            dispatch({type: types.TOGGLE_OPEN_TASK_MODAL })
+        },
+
+        addTask: (data) => {
+            dispatch((dispatch) => addTaskThunk(dispatch, data))
+        },
+
+        toggleOpenConfirm: () => {
+            dispatch({ type: types.OPEN_TOGGLE_CONFIRM })
+        },
+
+        toggleSelectedTasks: (_id) => {
+            dispatch({type: types.TOGGLE_SELECTED_TASKS, _id})
+        },
+        
+        deleteCheckedTasks: (selectedTasks) => {
+            dispatch((dispatch) => deleteCheckedHandlerTasksThunk(dispatch, selectedTasks))
+        },
+
+        toggleCheckTasks: () => {
+            dispatch({ type: types.CHECK_ALL })
+        },
+
+        setEditTasks: (editableTask) => dispatch({ type: types.SET_EDIT_TASK, editableTask }),
+        
+        editTaskHandler: (editTask) => {
+            dispatch(() => editTaskHandlerThunk(dispatch, editTask))
+        }
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ToDoList);

@@ -7,9 +7,28 @@
 .cardTask{
     color: rgba(82,82,85);
     margin-top: 10px;
-    background-image: linear-gradient(to right top, #36e92e, #44e232, rgb(79, 220, 54), #57d53a, #5ecf3e, #5ed14b, #5fd257, #61d462, #5fde78, #5de88d, #5df2a2, #5ffbb7);    
+    background: rgb(24,102,244);
+    background: radial-gradient(circle, rgba(24,102,244,1) 0%, rgba(16,101,156,1) 59%, rgba(41,97,142,1) 100%);
 }
 
 .checkedTask{
-    background: rgba(79,220, 54, .4);
+    background: rgba(37, 53, 139, 0.4);
+}
+
+.checkbox-btn{
+    margin: 0 auto;
+}
+
+.task-link{
+    color: #47a6cc;
+    transition: all .3s ease-in-out;
+}
+
+.task-link:hover{
+    text-decoration: none;
+    color: #5dc6f0;
+}
+
+.task-text{
+    color: white;
 }

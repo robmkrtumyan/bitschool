@@ -6,12 +6,17 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import "react-datepicker/dist/react-datepicker.css";
 import { BrowserRouter } from 'react-router-dom';
+import {Provider} from 'react-redux'
+import './Components/Redux/store'
+import store from './Components/Redux/store'
 
 ReactDOM.render(
   
   <React.StrictMode>
     <BrowserRouter>
-      <App />
+      <Provider store={store}>
+        <App />
+      </Provider>
     </BrowserRouter>
   </React.StrictMode>
   ,

@@ -7,6 +7,7 @@ import ToDoList from '../ToDoList/ToDoList'
 import NotFound from '../NotFound/NotFound'
 import styles from './Navbar.module.css'
 import SingleTask from '../SingleTask/SingleTask';
+import { Component } from 'react';
 
 const routingItems = [
     {
@@ -50,11 +51,12 @@ const items = [
         title: 'Contact'
     }
 ]
-function NavbarMenu() {
+class NavbarMenu extends Component{
+    render(){
     const navItems = items.map((item, index) => {
         return(
             <Nav.Item className={styles.link} key={index}>
-                <NavLink to={item.to}>
+                <NavLink to={item.to}  className={styles.navbarLinks}>
                     {item.title}
                 </NavLink>
             </Nav.Item>
@@ -76,6 +78,7 @@ function NavbarMenu() {
                 </Switch>
             </>
     )
+    }
 }
 
 export default NavbarMenu

@@ -1,7 +1,7 @@
 import React, { memo } from 'react'
 import { Card, Button } from 'react-bootstrap'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTrash, faEdit } from '@fortawesome/free-solid-svg-icons'
+import { faTrash, faEdit, faCheck, faHourglassHalf } from '@fortawesome/free-solid-svg-icons'
 import PropTypes from 'prop-types'
 import './Task.css'
 import { Link } from 'react-router-dom'
@@ -14,7 +14,8 @@ function Task(props) {
         checkedToggleHandler, 
         selectedTask,
         setEditTask,
-        showDeleteLoader
+        showDeleteLoader,
+        toggleStatus
     } = props
 
     const selTask = ['cardTask']
@@ -49,11 +50,20 @@ function Task(props) {
                                 <FontAwesomeIcon icon={faTrash} />
                             </Button>
                             <Button 
-                                variant="warning" 
+                                variant="dark" 
                                 className="icon-button ml-2 mb-2"
                                 onClick={() => setEditTask(task)}
                             >
                                 <FontAwesomeIcon icon={faEdit} />
+                            </Button>
+                            <Button
+                                variant={task.status === "done" ? "success" : "warning"}
+                                className="icon-button ml-2 mb-2"
+                                onClick={() => toggleStatus(task)}
+                            >
+                                {/* {task.status === "done" && <FontAwesomeIcon icon={faCheck} />}
+                                {task.status === "active" && <FontAwesomeIcon icon={faHourglassHalf} />} */}
+                                <FontAwesomeIcon icon={task.status === "active" ? faHourglassHalf : faCheck} />
                             </Button>
                         </div>
                 </Card.Body>
@@ -70,7 +80,8 @@ Task.propTypes = {
     deleteTask: PropTypes.func.isRequired,
     checkedToggleHandler: PropTypes.func.isRequired,
     selectedTaskCheck: PropTypes.bool.isRequired,
-    selectedTask: PropTypes.bool.isRequired
+    selectedTask: PropTypes.bool.isRequired,
+    toggleStatus: PropTypes.func.isRequired
 }
 
 export default memo(Task);

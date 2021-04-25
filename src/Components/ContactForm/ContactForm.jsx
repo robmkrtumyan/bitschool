@@ -1,14 +1,10 @@
-import React, { Component } from 'react'
-import { Form, Row, Col, Button } from 'react-bootstrap'
+import React, {useRef, useEffect} from 'react'
+import {withRouter} from 'react-router-dom'
 import './ContactForm.css'
-import { withRouter } from 'react-router-dom'
-import { isRequire, max, min, emailValidation } from '../utils/validators'
-import {contactContext} from '../Context/context'
-
-const API_HOST = "http://localhost:3001"
-
-const maxLength30 = max(30)
-const minLength3 = min(3)
+import { Form, Button, Col, Row } from 'react-bootstrap'
+import { connect } from 'react-redux'
+import { changeContactFormHandlerThunk, sendFormHandlerThunk } from '../Redux/action'
+import Spinner from '../Spinner/Spinner'
 
 const inputDetails = [
     {
@@ -33,135 +29,80 @@ const inputDetails = [
     }
 ]
 
-class ContactForm extends Component {
-    state = {
-        email: {
-            valid: false,
-            error: null,
-            value: ""
-        },
-        name: {
-            valid: false,
-            error: null,
-            value: ""
-        },
-        message: {
-            valid: false,
-            error: null,
-            value: ""
-        },
-        loading: false,
-        errorMessage: ""
-    }
 
-    changeHandler = (event) => {
-        const {name, value} = event.target
-        let valid = true
-        let error = isRequire(value) || maxLength30(value) || minLength3(value) || (name === "email" && emailValidation(value));
-        if(error){
-            valid = false
-        }
-        this.setState({
-            [name]: {
-                valid: valid,
-                error: error,
-                value: value
-            }
-        })
-    }
+const ContactForm = (props) => {
+    const {
+        formData,
+        loading,
+        changeContactFormHandlerThunk,
+        sendFormHandlerThunk
+    } = props
 
-    sendFormHandler = () => {
-        const formData = {...this.state}
-        for(let key in formData){
-            if(typeof formData[key] === "object" && formData[key].hasOwnProperty("value")){
-                formData[key] = formData[key].value
-            } else{
-                delete formData[key]
-            }
-        }
+    const inpFocus = useRef(null)
+    useEffect(() => {
+        inpFocus.current.focus()
+    }, [])
 
-        this.setState({
-            loading: true,
-            errorMessage: null
-        })
-
-        fetch(`${API_HOST}/form`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(formData)
-        })
-        .then(res=>res.json())
-        .then(data=>{
-            if(data.error)
-                throw data
-            this.props.history.push('/')
-            console.log(data)
-        })
-        .catch(error=>{
-            this.setState({
-                loading: false,
-                errorMessage: error.message
-            })
-            console.log(error)
-        })
-    }
-
-    render() {
-        const inputJSX = inputDetails.map((input, index) => {
-            return(
-                <Form.Group as={Row} controlId="formHorizontalEmail" key={index}>
-                    <Form.Label column sm={3}>
-                        { input.labelTxt }
-                    </Form.Label>
-                    <Col sm={9}>
-                        <Form.Control 
-                            name={input.name}
-                            type={input.type} 
-                            placeholder={input.placeholder} 
-                            onChange={this.changeHandler}
-                            value={this.state[input.name].value}
-                            as={input.as || undefined}
-                            row={input.row || undefined}
-                            required
-                        />
-                        <Form.Text className="required-field ml-1">
-                            {this.state[input.name].error}
-                        </Form.Text>
-                    </Col>
-                </Form.Group>
+    const inputJSX = inputDetails.map((input, index) => {
+        return(
+            <Form.Group as={Row} controlId="formHorizontalEmail" key={index}>
+                <Form.Label column sm={3}>
+                    { input.labelTxt }
+                </Form.Label>
+                <Col sm={9}>
+                    <Form.Control 
+                        ref={index === 0 ? inpFocus : null}
+                        name={input.name} 
+                        type={input.type} 
+                        placeholder={input.placeholder} 
+                        onChange={(e) => changeContactFormHandlerThunk(e.target)}
+                        value={formData[input.name].value} 
+                        as={input.as || undefined} 
+                        row={input.row || undefined} 
+                        required />
+                </Col>
+            </Form.Group>
             )
-        })
-        
-        return (
-            <contactContext.Consumer>
+    })
+
+    return (
+            <>
+                <Form className="form_wrapper" onSubmit={(e)=> e.preventDefault()}>
+                    {inputJSX}
+                    <Form.Group as={Row}>
+                        <Col className="d-flex justify-content-center">
+                        <Button 
+                            type="submit" 
+                            className="submit_btn" 
+                            onClick={() => sendFormHandlerThunk(formData, props.history)}
+                        >
+                            Send
+                        </Button>
+                        </Col>
+                    </Form.Group>
+                </Form>
                 {
-                    (context) => {
-                        console.log("context", context)
-                        return <>
-                        <Form className="form_wrapper" onSubmit={(e) => e.preventDefault()}>
-                            {this.state.errorMessage}
-                            {inputJSX}
-                            <Form.Group as={Row}>
-                                <Col className="d-flex justify-content-center">
-                                    <Button 
-                                        type="submit" 
-                                        className="submit_btn"
-                                        onClick={this.sendFormHandler}
-                                    >
-                                        Send
-                                    </Button>
-                                </Col>
-                            </Form.Group>
-                        </Form>
-                    </>
-                    }
+                    loading && <Spinner />
                 }
-                
-            </contactContext.Consumer>
-        )
+            </>
+    )
+}
+
+const mapStateToProps = (state) => {
+    const {email, name, message} = state.contactState
+    return{
+        formData:{
+            email,
+            name,
+            message,
+        },
+        loading: state.globalState.loading
     }
 }
 
-export default withRouter(ContactForm)
+const mapDispatchToProps = {
+    changeContactFormHandlerThunk,
+    sendFormHandlerThunk
+}
+
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(ContactForm))

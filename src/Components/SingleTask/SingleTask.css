@@ -1,3 +1,7 @@
+.singleTask_wrapper_content{
+    margin-top: 10%;
+}
+
 .singleTask_wrapper{
     width: 350px;
     min-height: 350px;
@@ -5,11 +9,27 @@
     padding: 10px;
     color: rgb(202, 242, 191);
     box-sizing: border-box;
-    background-image: linear-gradient(to right top, #36e92e, #44e232, rgb(79, 220, 54), #57d53a, #5ecf3e, #5ed14b, #5fd257, #61d462, #5fde78, #5de88d, #5df2a2, #5ffbb7);    
+    background: rgb(25,137,227);
+background: radial-gradient(circle, rgba(25,137,227,1) 0%, rgba(8,118,189,1) 35%, rgba(43,110,195,1) 75%, rgba(3,92,255,1) 97%);
     border: 1px solid rgb(10, 128, 59);
     text-align: center;
 }
 
 .singleTask_wrapper h3:first-child{
-    margin-top: 35%;
+    margin-top: 24%;
+}
+
+.icon-button{
+    height: 37px;
+    width: 40px;
+    font-size: 18px;
+}
+
+.back_btn{
+    margin-top: 15px;
+}
+
+.back_btn a{
+    font-size: 18px;
+    color: rgb(21, 56, 112);
 }

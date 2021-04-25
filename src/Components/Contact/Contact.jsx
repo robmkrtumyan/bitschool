@@ -1,16 +1,9 @@
 import React from 'react'
-import ContactFormReducer from '../ContactForm/ContactFormReducer'
-// import ContactForm from '../ContactForm/ContactForm'
-// import ContactProvider from '../Context/Provider/ContactProvider'
-// import ContactFormContext from '../ContactForm/ContactFormContext'
-function Contact() {
+import ContactForm from '../ContactForm/ContactForm'
+const Contact = () => {
     return (
         <div className="d-flex justify-content-center">
-            {/* <ContactForm /> */}
-            {/* <ContactProvider>
-                <ContactFormContext />
-            </ContactProvider> */}
-            <ContactFormReducer />
+            <ContactForm />
         </div>
     )
 }

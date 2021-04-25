@@ -1,14 +1,12 @@
-import React, { Component } from 'react'
+import React from 'react'
 import NavbarMenu from './Components/Navbar/Navbar'
 
-class App extends Component {  
-  render() {  
+const App = () => {  
     return (
       <div>
         <NavbarMenu />
       </div>
     )
-  }
 }
 
 export default App

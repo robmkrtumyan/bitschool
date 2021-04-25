@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import { Route, NavLink, Switch, Redirect } from "react-router-dom";
 import { Nav } from 'react-bootstrap'
 import About from '../About/About'
@@ -7,7 +7,9 @@ import ToDoList from '../ToDoList/ToDoList'
 import NotFound from '../NotFound/NotFound'
 import styles from './Navbar.module.css'
 import SingleTask from '../SingleTask/SingleTask';
-import { Component } from 'react';
+import SingleTaskProvider from '../Context/Provider/SingleTaskProvider';
+import {connect} from 'react-redux'
+import {ToastContainer, toast} from 'react-toastify'
 
 const routingItems = [
     {
@@ -51,8 +53,32 @@ const items = [
         title: 'Contact'
     }
 ]
-class NavbarMenu extends Component{
-    render(){
+const NavbarMenu = (props) => {
+    const {errorMessage, successMessage} = props
+    useEffect(() => {
+        errorMessage && toast.error(`🦄 ${errorMessage}`, {
+            position: "bottom-left",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            });
+    }, [errorMessage])
+
+    useEffect(() => {
+        successMessage && toast.success(`🦄 ${successMessage}`, {
+            position: "bottom-left",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            });
+    }, [successMessage])
+
     const navItems = items.map((item, index) => {
         return(
             <Nav.Item className={styles.link} key={index}>
@@ -63,22 +89,39 @@ class NavbarMenu extends Component{
         )
     })
     const routingItem = routingItems.map((item, index) => {
-        return(
-            <Route key={index} path={item.path} exact={item.exact}  component={item.component} />
-        )        
+        if(item.path === "/task/:id"){
+            return <Route 
+                key={index} 
+                path={item.path} 
+                exact={item.exact}  
+                render={(props) => (
+                    <SingleTaskProvider {...props}>
+                        <item.component {...props} />
+                    </SingleTaskProvider>
+                )} />
+        }
+    return (
+        <Route key={index} path={item.path} exact={item.exact}  component={item.component} />
+    )        
     })
     return (
-            <>
-                <Nav className="justify-content-center" activeKey="/home">
-                    {navItems}
-                </Nav>
-                <Switch>
-                    {routingItem}
-                    <Redirect to="/404" component={NotFound} />
-                </Switch>
-            </>
+        <>
+            <Nav className="justify-content-center" activeKey="/home">
+                {navItems}
+            </Nav>
+            <Switch>
+                {routingItem}
+                <Redirect to="/404" component={NotFound} />
+            </Switch>
+
+            <ToastContainer />
+        </>
     )
-    }
 }
 
-export default NavbarMenu
+const mapStateToProps = (state) => ({
+    errorMessage: state.globalState.errorMessage,
+    successMessage: state.globalState.successMessage
+})
+
+export default connect(mapStateToProps, null)(NavbarMenu)

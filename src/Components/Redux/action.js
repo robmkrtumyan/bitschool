@@ -292,12 +292,14 @@ export const sendFormHandlerThunk = (formData, history) => (dispatch) => {
 export const toggleStatusThunk = (task) => (dispatch) => {
     const status = task.status === "done" ? "active" : "done"
     fetch(`${API_HOST}/task/${task._id}`, {
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({status})
-    })
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                status
+            })
+        })
         .then(res => res.json())
         .then(data => {
             if (data.error)
@@ -313,4 +315,79 @@ export const toggleStatusThunk = (task) => (dispatch) => {
                 error: error.message
             })
         })
+}
+
+export const setDropDownItems = (dropDown, value) => (dispatch) => {
+    dispatch({
+        type: types.SET_DROPDOWN_VARIANT,
+        dropDown,
+        value
+    })
+
+}
+
+export const changeSearchThunk = (target) => (dispatch) => {
+    dispatch({
+        type: types.SEARCH_VALUE,
+        target
+    })
+}
+
+export const searchDateThunk = (name, date) => (dispatch) => {
+    dispatch({
+        type: types.SEARCH_DATE,
+        name,
+        date
+    })
+}
+
+export const searchOrFilterThunk = (formData) => (dispatch) => {
+    let formDataFilter = {...formData}
+    window.formDataFilter = formDataFilter
+    let query = "?"
+    for(let key in formDataFilter){
+        if(!formDataFilter[key]) delete formDataFilter[key]
+        else{
+            query += key + "=" + formDataFilter[key] + "&"
+        }
+    }
+
+    if(Object.keys(formDataFilter).length){
+        fetch(`${API_HOST}/task${query.slice(0, query.length - 1)}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.error)
+                throw data.error
+
+            dispatch({
+                type: types.SET_TASKS,
+                data
+            })
+            dispatch({
+                type: types.SEARCH_RESET
+            })
+        })
+        .catch(error => {
+            dispatch({
+                type: types.SET_ERROR_MESSAGE,
+                error: error.message
+            })
+        })        
+    }
+}
+
+export const changeModalInputThunk = (target) => (dispatch) => {
+    dispatch({type: types.CHANGE_MODAL_INPUT, target})
+}
+
+export const changeModalDateThunk = (date) => (dispatch) => {
+    dispatch({type: types.CHANGE_MODAL_DATE, date})
+}
+
+export const editModalTaskThunk = (editTask) => (dispatch) => {
+    dispatch({ type: types.EDIT_MODAL_TASK, editTask })
+}
+
+export const resetModalTaskThunk = () => (dispatch) => {
+    dispatch({ type: types.RESET_MODAL_TASK })
 }

@@ -16,9 +16,11 @@ import {
     editTaskHandlerThunk,
     toggleStatusThunk
 } from '../Redux/action'
+import Search from '../Search/Search'
 
 const ToDoList = (props) => {    
     const { setTasks } = props
+    
     useEffect(() => {
         setTasks()
     }, [setTasks])
@@ -42,7 +44,6 @@ const ToDoList = (props) => {
         editTaskHandler, 
         setEditTasks,
         errorMessage
-        // toggleStatus
     } = props
 
     const showTasks = tasks.map( task => {
@@ -66,6 +67,11 @@ const ToDoList = (props) => {
         <>
             <Container>
                 <div className="todo-wrapper">
+                    <Row>
+                        <Col>
+                            <Search />
+                        </Col>
+                    </Row>
                     <Row>
                         <h2 className="error_message">
                             { errorMessage }

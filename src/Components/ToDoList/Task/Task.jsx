@@ -7,7 +7,7 @@ import './Task.css'
 import { Link } from 'react-router-dom'
 import DeleteSpinner from '../../DeleteSpinner/DeleteSpinner'
 
-function Task(props) {
+const Task = (props) => {
     const {
         task, 
         deleteTask, 
